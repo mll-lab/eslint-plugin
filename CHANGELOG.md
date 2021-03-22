@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/mll-lab/eslint-plugin/compare/v1.1.0...v1.1.1) (2021-03-22)
+
+
+### Bug Fixes
+
+* Target commonjs ([b7c2455](https://github.com/mll-lab/eslint-plugin/commit/b7c2455c9ac7ada9bc11974dddf621d2d2dd80cb))
+
 # [1.1.0](https://github.com/mll-lab/eslint-plugin/compare/v1.0.0...v1.1.0) (2021-03-22)
 
 
