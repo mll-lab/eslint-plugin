@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/mll-lab/eslint-plugin/compare/v1.0.0...v1.1.0) (2021-03-22)
+
+
+### Features
+
+* Add rule cast-to-boolean ([7698206](https://github.com/mll-lab/eslint-plugin/commit/76982069d23c8da415dbffc5d673658dc9eff44e))
+
 # 1.0.0 (2021-03-22)
 
 
