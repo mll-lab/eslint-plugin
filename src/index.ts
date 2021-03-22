@@ -7,15 +7,15 @@ const rules = {
 };
 
 const recommendedRules = {
-  'mll-lab/cast-to-boolean': 'error',
-  'mll-lab/no-color-literals': 'error',
+  '@mll-lab/cast-to-boolean': 'error',
+  '@mll-lab/no-color-literals': 'error',
 };
 
-export default {
+export = {
   rules,
   configs: {
     recommended: {
-      plugins: ['mll-lab'],
+      plugins: ['@mll-lab'],
       rules: recommendedRules,
     },
   },
