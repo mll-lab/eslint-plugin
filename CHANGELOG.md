@@ -1,0 +1,18 @@
+# 1.0.0 (2021-03-22)
+
+
+### Bug Fixes
+
+* Clean up CHANGELOG.md, actually release ([ac3b53c](https://github.com/mll-lab/eslint-plugin/commit/ac3b53c735e727797ed7386822519b7b5bd095d4))
+
+
+### Features
+
+* Initial release ([8b6adc3](https://github.com/mll-lab/eslint-plugin/commit/8b6adc39dc7824139a2659a7911fd2888a34661e))
+
+# 1.0.0 (2021-03-22)
+
+
+### Features
+
+* Initial release ([7bf7ebd](https://github.com/mll-lab/eslint-plugin/commit/7bf7ebdea801dc88144534b538f39acb2569220c))
