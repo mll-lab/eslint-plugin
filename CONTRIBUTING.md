@@ -1,8 +1,7 @@
-# error vs. warning
+# Resources
 
-Always use `error` for enabled rules, never `warning`.
-If the rule is too strict in some cases, violations should be addressed where
-they occur instead of spamming the lint output.
+- https://eslint.org/docs/developer-guide/working-with-plugins
+- https://www.npmjs.com/package/@typescript-eslint/experimental-utils
 
 # Commit Messages
 
