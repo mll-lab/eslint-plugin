@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/mll-lab/eslint-plugin/compare/v1.1.1...v1.1.2) (2021-03-22)
+
+
+### Bug Fixes
+
+* Reference own rules properly ([368e815](https://github.com/mll-lab/eslint-plugin/commit/368e81578c6ab9ae596a4cf0f43aba366694638f))
+
 ## [1.1.1](https://github.com/mll-lab/eslint-plugin/compare/v1.1.0...v1.1.1) (2021-03-22)
 
 
