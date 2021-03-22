@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/mll-lab/eslint-plugin/compare/v1.1.2...v1.2.0) (2021-03-22)
+
+
+### Features
+
+* Add rule no-global-styles ([2ebfc13](https://github.com/mll-lab/eslint-plugin/commit/2ebfc1326f81e4894d047bc0623773523e564b2b))
+
 ## [1.1.2](https://github.com/mll-lab/eslint-plugin/compare/v1.1.1...v1.1.2) (2021-03-22)
 
 
