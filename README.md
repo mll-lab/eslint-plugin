@@ -12,6 +12,6 @@ Extend your ESLint configuration file:
 
 ```js
   "extends": [
-    "plugin:mll-lab/recommended",  
+    "plugin:@mll-lab/recommended",  
   ],
 ```
