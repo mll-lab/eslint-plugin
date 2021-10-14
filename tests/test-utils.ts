@@ -2,10 +2,10 @@ import { resolve } from 'path';
 
 import { TSESLint } from '@typescript-eslint/experimental-utils';
 
-export const createRuleTester = (
+export function createRuleTester(
   parserOptions: Partial<TSESLint.ParserOptions> = {},
-) =>
-  new TSESLint.RuleTester({
+): TSESLint.RuleTester {
+  return new TSESLint.RuleTester({
     parser: resolve('./node_modules/@typescript-eslint/parser'),
     parserOptions: {
       ecmaVersion: 2018,
@@ -13,3 +13,4 @@ export const createRuleTester = (
       ...parserOptions,
     },
   });
+}
