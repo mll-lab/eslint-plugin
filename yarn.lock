@@ -532,6 +532,21 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
+"@mll-lab/eslint-config@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@mll-lab/eslint-config/-/eslint-config-1.1.0.tgz#b08db3617222824b0eed0fb030c6455b0ba3eca9"
+  integrity sha512-9eGlP7dzLpNEIuLXE+of1XmC9cq2y49m7c7gAag952HaD3cDaTPGnyMueawe8bwjL58B9BrIBxPLrGRgyen1JA==
+  dependencies:
+    "@typescript-eslint/eslint-plugin" "^4.18.0"
+    "@typescript-eslint/parser" "^4.18.0"
+    eslint "^7.22.0"
+    eslint-config-airbnb-base "^14.2.1"
+    eslint-config-prettier "^8.1.0"
+    eslint-plugin-import "^2.22.1"
+    eslint-plugin-prettier "^3.3.1"
+    eslint-plugin-unused-imports "^1.1.0"
+    typescript "^3 || ^4"
+
 "@mll-lab/prettier-config@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@mll-lab/prettier-config/-/prettier-config-1.0.0.tgz#e46490204f9ca1a2131d1790e246e7ca74d23c7d"
@@ -8188,6 +8203,11 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
+
+"typescript@^3 || ^4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.4.tgz#2cd01a1a1f160704d3101fd5a58ff0f9fcb8030c"
+  integrity sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==
 
 typescript@^4.2.3:
   version "4.2.3"
