@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/mll-lab/eslint-plugin/compare/v1.2.0...v1.3.0) (2022-02-02)
+
+
+### Bug Fixes
+
+* remove category ([23c8565](https://github.com/mll-lab/eslint-plugin/commit/23c856557f2d53525427ebe1fcb424902bfa8246))
+
+
+### Features
+
+* upgrade dependencies ([2b0a1eb](https://github.com/mll-lab/eslint-plugin/commit/2b0a1ebd650d77d5776577a7a548814c176b1b65))
+
 # [1.2.0](https://github.com/mll-lab/eslint-plugin/compare/v1.1.2...v1.2.0) (2021-03-22)
 
 
