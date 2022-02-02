@@ -19,7 +19,6 @@ export const noColorLiterals = ESLintUtils.RuleCreator((name) => name)({
     docs: {
       description:
         'Checks for color strings, such as #000, #000000, rgb(... or rgba(...',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages: {

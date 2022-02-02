@@ -7,7 +7,6 @@ export const castToBoolean = ESLintUtils.RuleCreator((name) => name)({
     type: 'suggestion',
     docs: {
       description: 'Canonicalizes boolean casts',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages: {
