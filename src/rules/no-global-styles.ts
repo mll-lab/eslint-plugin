@@ -6,7 +6,6 @@ export const noGlobalStyles = ESLintUtils.RuleCreator((name) => name)({
     type: 'problem',
     docs: {
       description: 'Avoid polluting global styles with raw CSS imports',
-      category: 'Best Practices',
       recommended: 'error',
     },
     messages: {
