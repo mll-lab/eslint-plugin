@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/mll-lab/eslint-plugin/compare/v1.3.0...v1.3.1) (2022-02-09)
+
+
+### Bug Fixes
+
+* include @typescript-eslint/experimental-utils in dependencies ([9d71661](https://github.com/mll-lab/eslint-plugin/commit/9d71661e51e4c0bf752fddefe73ec2d03f256c3c))
+
 # [1.3.0](https://github.com/mll-lab/eslint-plugin/compare/v1.2.0...v1.3.0) (2022-02-02)
 
 
