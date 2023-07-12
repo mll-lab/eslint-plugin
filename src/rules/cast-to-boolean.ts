@@ -1,7 +1,10 @@
 // https://www.frontendmayhem.com/writing-your-own-eslint-plugin-autofix-code
-import { ESLintUtils } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESLint } from '@typescript-eslint/experimental-utils';
 
-export const castToBoolean = ESLintUtils.RuleCreator((name) => name)({
+export const castToBoolean: TSESLint.RuleModule<
+  string,
+  Array<never>
+> = ESLintUtils.RuleCreator((name) => name)({
   name: 'cast-to-boolean',
   meta: {
     type: 'suggestion',

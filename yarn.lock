@@ -1265,7 +1265,7 @@
     "@typescript-eslint/types" "6.0.0"
     "@typescript-eslint/visitor-keys" "6.0.0"
 
-"@typescript-eslint/type-utils@6.0.0":
+"@typescript-eslint/type-utils@6.0.0", "@typescript-eslint/type-utils@^6":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/type-utils/-/type-utils-6.0.0.tgz#0478d8a94f05e51da2877cc0500f1b3c27ac7e18"
   integrity sha512-ah6LJvLgkoZ/pyJ9GAdFkzeuMZ8goV6BH7eC9FPmojrnX9yNCIsfjB+zYcnex28YO3RFvBkV6rMV6WpIqkPvoQ==

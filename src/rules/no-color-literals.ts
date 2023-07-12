@@ -1,4 +1,4 @@
-import { ESLintUtils } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESLint } from '@typescript-eslint/experimental-utils';
 
 function isColorLiteral(value: unknown): boolean {
   if (typeof value !== 'string') {
@@ -12,7 +12,10 @@ function isColorLiteral(value: unknown): boolean {
   );
 }
 
-export const noColorLiterals = ESLintUtils.RuleCreator((name) => name)({
+export const noColorLiterals: TSESLint.RuleModule<
+  string,
+  Array<never>
+> = ESLintUtils.RuleCreator((name) => name)({
   name: 'no-color-literals',
   meta: {
     type: 'problem',
