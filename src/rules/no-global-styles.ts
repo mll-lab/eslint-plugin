@@ -1,6 +1,9 @@
-import { ESLintUtils } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESLint } from '@typescript-eslint/experimental-utils';
 
-export const noGlobalStyles = ESLintUtils.RuleCreator((name) => name)({
+export const noGlobalStyles: TSESLint.RuleModule<
+  string,
+  Array<never>
+> = ESLintUtils.RuleCreator((name) => name)({
   name: 'no-global-styles',
   meta: {
     type: 'problem',
