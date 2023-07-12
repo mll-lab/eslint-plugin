@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/mll-lab/eslint-plugin/compare/v1.3.2...v1.3.3) (2023-07-12)
+
+
+### Bug Fixes
+
+* remove unnecessary dependencies ([fe9a32d](https://github.com/mll-lab/eslint-plugin/commit/fe9a32d61246905105dcf7187d40113f6e402efa))
+
 ## [1.3.2](https://github.com/mll-lab/eslint-plugin/compare/v1.3.1...v1.3.2) (2023-01-23)
 
 
