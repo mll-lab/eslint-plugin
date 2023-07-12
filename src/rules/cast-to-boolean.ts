@@ -1,4 +1,4 @@
-// https://www.frontendmayhem.com/writing-your-own-eslint-plugin-autofix-code/
+// https://www.frontendmayhem.com/writing-your-own-eslint-plugin-autofix-code
 import { ESLintUtils } from '@typescript-eslint/experimental-utils';
 
 export const castToBoolean = ESLintUtils.RuleCreator((name) => name)({
