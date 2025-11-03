@@ -1,3 +1,4 @@
+import { TSESLint } from '@typescript-eslint/experimental-utils';
 import { castToBoolean } from './rules/cast-to-boolean';
 import { noColorLiterals } from './rules/no-color-literals';
 import { noGlobalStyles } from './rules/no-global-styles';
@@ -8,13 +9,20 @@ const rules = {
   'no-global-styles': noGlobalStyles,
 };
 
-const recommendedRules = {
+const recommendedRules: Record<string, TSESLint.Linter.RuleEntry> = {
   '@mll-lab/cast-to-boolean': 'error',
   '@mll-lab/no-color-literals': 'error',
   '@mll-lab/no-global-styles': 'error',
 };
 
-export = {
+interface Plugin {
+  rules: typeof rules;
+  configs: {
+    recommended: TSESLint.Linter.Config;
+  };
+}
+
+const plugin: Plugin = {
   rules,
   configs: {
     recommended: {
@@ -23,3 +31,5 @@ export = {
     },
   },
 };
+
+export = plugin;
