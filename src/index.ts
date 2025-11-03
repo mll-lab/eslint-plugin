@@ -1,4 +1,5 @@
 import { TSESLint } from '@typescript-eslint/experimental-utils';
+
 import { castToBoolean } from './rules/cast-to-boolean';
 import { noColorLiterals } from './rules/no-color-literals';
 import { noGlobalStyles } from './rules/no-global-styles';
@@ -15,12 +16,12 @@ const recommendedRules: Record<string, TSESLint.Linter.RuleEntry> = {
   '@mll-lab/no-global-styles': 'error',
 };
 
-interface Plugin {
+type Plugin = {
   rules: typeof rules;
   configs: {
     recommended: TSESLint.Linter.Config;
   };
-}
+};
 
 const plugin: Plugin = {
   rules,
