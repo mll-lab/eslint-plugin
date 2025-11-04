@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/mll-lab/eslint-plugin/compare/v1.3.4...v1.3.5) (2025-11-04)
+
+
+### Bug Fixes
+
+* add missing eslint plugin dependencies ([cd2410d](https://github.com/mll-lab/eslint-plugin/commit/cd2410d8772454ebef7f9766da2befb7aa5537eb))
+
 ## [1.3.4](https://github.com/mll-lab/eslint-plugin/compare/v1.3.3...v1.3.4) (2023-07-12)
 
 
