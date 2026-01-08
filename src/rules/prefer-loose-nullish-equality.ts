@@ -25,6 +25,7 @@
  */
 
 import {
+  AST_NODE_TYPES,
   ESLintUtils,
   TSESLint,
   TSESTree,
@@ -59,14 +60,20 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      * Check if a node is the literal null
      */
     function isNullLiteral(node: TSESTree.Node): boolean {
-      return node.type === 'Literal' && node.value === null;
+      return (
+        node.type === AST_NODE_TYPES.Literal &&
+        (node as TSESTree.Literal).value === null
+      );
     }
 
     /**
      * Check if a node is the identifier undefined
      */
     function isUndefinedIdentifier(node: TSESTree.Node): boolean {
-      return node.type === 'Identifier' && node.name === 'undefined';
+      return (
+        node.type === AST_NODE_TYPES.Identifier &&
+        (node as TSESTree.Identifier).name === 'undefined'
+      );
     }
 
     /**
@@ -156,8 +163,8 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
 
         // Must be binary expressions on both sides
         if (
-          left.type !== 'BinaryExpression' ||
-          right.type !== 'BinaryExpression'
+          left.type !== AST_NODE_TYPES.BinaryExpression ||
+          right.type !== AST_NODE_TYPES.BinaryExpression
         ) {
           return;
         }
