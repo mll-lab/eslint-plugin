@@ -71,8 +71,7 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      */
     function isUndefinedIdentifier(node: TSESTree.Node): boolean {
       return (
-        node.type === AST_NODE_TYPES.Identifier &&
-        (node as TSESTree.Identifier).name === 'undefined'
+        node.type === AST_NODE_TYPES.Identifier && node.name === 'undefined'
       );
     }
 
@@ -109,7 +108,9 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      * Check if a BinaryExpression checks for undefined
      */
     function checksUndefined(node: TSESTree.BinaryExpression): boolean {
-      return isUndefinedIdentifier(node.left) || isUndefinedIdentifier(node.right);
+      return (
+        isUndefinedIdentifier(node.left) || isUndefinedIdentifier(node.right)
+      );
     }
 
     /**
