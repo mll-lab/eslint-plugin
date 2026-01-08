@@ -6,20 +6,22 @@
  * - In JavaScript: null !== undefined but null == undefined
  * - Loose comparison to null covers both cases with a single check
  *
+ * This rule ONLY flags explicit combined checks. Single checks are considered intentional.
+ *
  * Examples:
  *
- * // Bad
+ * // Bad (redundant combined checks)
  * if (value === null || value === undefined) { }
- * if (value === null) { }  // when value could also be undefined
  * if (value !== null && value !== undefined) { }
  *
  * // Good
  * if (value == null) { }
  * if (value != null) { }
  *
- * // Still OK (not nullish comparisons)
+ * // Also OK (intentional single checks)
+ * if (value === null) { }  // explicitly checking only null
+ * if (value !== undefined) { }  // explicitly checking only undefined
  * if (typeof value === 'undefined') { }  // typeof check
- * if (x === y) { }  // comparing two variables
  */
 
 import {
@@ -75,13 +77,6 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
     }
 
     /**
-     * Check if a node is a typeof expression
-     */
-    function isTypeofExpression(node: TSESTree.Node): boolean {
-      return node.type === 'UnaryExpression' && node.operator === 'typeof';
-    }
-
-    /**
      * Get the non-nullish side of a binary expression
      */
     function getComparedExpression(
@@ -126,33 +121,6 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
     }
 
     /**
-     * Report a strict nullish comparison and provide a fix
-     */
-    function reportStrictNullishComparison(
-      node: TSESTree.BinaryExpression,
-    ): void {
-      const newOperator = node.operator === '===' ? '==' : '!=';
-      const comparedExpr = getComparedExpression(node);
-
-      if (!comparedExpr) {
-        return;
-      }
-
-      context.report({
-        node,
-        messageId: 'preferLooseNullishEquality',
-        data: {
-          operator: newOperator,
-        },
-        fix(fixer) {
-          const valueText = sourceCode.getText(comparedExpr);
-          const fixed = `${valueText} ${newOperator} null`;
-          return fixer.replaceText(node, fixed);
-        },
-      });
-    }
-
-    /**
      * Report a combined null/undefined check and provide a fix
      */
     function reportCombinedNullishCheck(
@@ -183,51 +151,6 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
     }
 
     return {
-      BinaryExpression(node: TSESTree.BinaryExpression): void {
-        // Only check strict equality operators
-        if (node.operator !== '===' && node.operator !== '!==') {
-          return;
-        }
-
-        // Don't flag typeof checks
-        if (isTypeofExpression(node.left) || isTypeofExpression(node.right)) {
-          return;
-        }
-
-        // Check if this is part of a combined null/undefined check
-        // If so, the LogicalExpression visitor will handle it
-        const { parent } = node;
-        if (parent && parent.type === 'LogicalExpression') {
-          const sibling = parent.left === node ? parent.right : parent.left;
-
-          // Check if both sides are nullish checks on the same variable
-          if (
-            sibling &&
-            sibling.type === 'BinaryExpression' &&
-            sibling.operator === node.operator &&
-            (isNullish(node.left) || isNullish(node.right)) &&
-            (isNullish(sibling.left) || isNullish(sibling.right))
-          ) {
-            const thisExpr = getComparedExpression(node);
-            const siblingExpr = getComparedExpression(sibling);
-
-            if (
-              thisExpr &&
-              siblingExpr &&
-              areExpressionsEquivalent(thisExpr, siblingExpr)
-            ) {
-              // Skip this node - the LogicalExpression visitor will handle it
-              return;
-            }
-          }
-        }
-
-        // Check if comparing to null or undefined
-        if (isNullish(node.left) || isNullish(node.right)) {
-          reportStrictNullishComparison(node);
-        }
-      },
-
       LogicalExpression(node: TSESTree.LogicalExpression): void {
         const { left, right, operator } = node;
 
