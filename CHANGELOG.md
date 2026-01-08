@@ -1,3 +1,10 @@
+# [1.4.0-alpha.1](https://github.com/mll-lab/eslint-plugin/compare/v1.3.5...v1.4.0-alpha.1) (2026-01-08)
+
+
+### Features
+
+* add prefer-loose-nullish-equality rule ([c55c50c](https://github.com/mll-lab/eslint-plugin/commit/c55c50ca01338a874dbf070301932db819eb4b7b))
+
 ## [1.3.5](https://github.com/mll-lab/eslint-plugin/compare/v1.3.4...v1.3.5) (2025-11-04)
 
 
