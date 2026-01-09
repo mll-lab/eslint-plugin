@@ -1,3 +1,11 @@
+# [1.4.0-alpha.2](https://github.com/mll-lab/eslint-plugin/compare/v1.4.0-alpha.1...v1.4.0-alpha.2) (2026-01-09)
+
+
+### Bug Fixes
+
+* make prefer-loose-nullish-equality less aggressive ([2d99f53](https://github.com/mll-lab/eslint-plugin/commit/2d99f530d3fc670818987188851f0e494e45403f))
+* use AST_NODE_TYPES enum for type comparisons ([722ec2b](https://github.com/mll-lab/eslint-plugin/commit/722ec2b184948f7e326d649eb40924a596bf63ea))
+
 # [1.4.0-alpha.1](https://github.com/mll-lab/eslint-plugin/compare/v1.3.5...v1.4.0-alpha.1) (2026-01-08)
 
 
