@@ -1,6 +1,6 @@
 {
   "name": "@mll-lab/eslint-plugin",
-  "version": "1.4.0-alpha.2",
+  "version": "1.4.0-alpha.3",
   "description": "ESLint plugin and common configuration of MLL",
   "main": "dist/index.js",
   "repository": {
