@@ -23,6 +23,7 @@
  */
 
 import {
+  AST_NODE_TYPES,
   ESLintUtils,
   TSESLint,
   TSESTree,
@@ -57,14 +58,16 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      * Check if a node is the literal null
      */
     function isNullLiteral(node: TSESTree.Node): boolean {
-      return node.type === 'Literal' && node.value === null;
+      return node.type === AST_NODE_TYPES.Literal && node.value === null;
     }
 
     /**
      * Check if a node is the identifier undefined
      */
     function isUndefinedIdentifier(node: TSESTree.Node): boolean {
-      return node.type === 'Identifier' && node.name === 'undefined';
+      return (
+        node.type === AST_NODE_TYPES.Identifier && node.name === 'undefined'
+      );
     }
 
     /**
@@ -78,7 +81,10 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      * Check if a node is a typeof expression
      */
     function isTypeofExpression(node: TSESTree.Node): boolean {
-      return node.type === 'UnaryExpression' && node.operator === 'typeof';
+      return (
+        node.type === AST_NODE_TYPES.UnaryExpression &&
+        node.operator === 'typeof'
+      );
     }
 
     /**
@@ -107,7 +113,9 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      * Check if a BinaryExpression checks for undefined
      */
     function checksUndefined(node: TSESTree.BinaryExpression): boolean {
-      return isUndefinedIdentifier(node.left) || isUndefinedIdentifier(node.right);
+      return (
+        isUndefinedIdentifier(node.left) || isUndefinedIdentifier(node.right)
+      );
     }
 
     /**
@@ -197,13 +205,12 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
         // Check if this is part of a combined null/undefined check
         // If so, the LogicalExpression visitor will handle it
         const { parent } = node;
-        if (parent && parent.type === 'LogicalExpression') {
+        if (parent && parent.type === AST_NODE_TYPES.LogicalExpression) {
           const sibling = parent.left === node ? parent.right : parent.left;
 
           // Check if both sides are nullish checks on the same variable
           if (
-            sibling &&
-            sibling.type === 'BinaryExpression' &&
+            sibling.type === AST_NODE_TYPES.BinaryExpression &&
             sibling.operator === node.operator &&
             (isNullish(node.left) || isNullish(node.right)) &&
             (isNullish(sibling.left) || isNullish(sibling.right))
@@ -233,8 +240,8 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
 
         // Must be binary expressions on both sides
         if (
-          left.type !== 'BinaryExpression' ||
-          right.type !== 'BinaryExpression'
+          left.type !== AST_NODE_TYPES.BinaryExpression ||
+          right.type !== AST_NODE_TYPES.BinaryExpression
         ) {
           return;
         }
