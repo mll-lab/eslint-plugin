@@ -30,31 +30,44 @@ ruleTester.run('prefer-loose-nullish-equality', preferLooseNullishEquality, {
 
     // Nullish coalescence
     { code: 'const result = value ?? defaultValue' },
-
-    // Single strict null checks (intentional, NOT flagged)
-    { code: 'value === null' },
-    { code: 'value !== null' },
-    { code: 'null === value' },
-
-    // Single strict undefined checks (intentional, NOT flagged)
-    { code: 'value === undefined' },
-    { code: 'value !== undefined' },
-    { code: 'undefined === value' },
-
-    // Complex expressions with single checks (intentional)
-    { code: 'obj.prop === null' },
-    { code: 'obj.prop.nested === undefined' },
-    { code: 'arr[0] === undefined' },
-    { code: 'items[index] !== null' },
-    { code: 'obj?.prop === null' },
-    { code: 'data?.user?.name !== undefined' },
-    { code: 'getValue() === null' },
-    { code: 'fetchData() !== undefined' },
-    { code: 'const result = value === null ? defaultValue : value' },
   ],
 
   invalid: [
-    // Pattern 1: Combined null/undefined OR checks
+    // Pattern 1: Single strict null check
+    {
+      code: 'value === null',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'value == null',
+    },
+    {
+      code: 'value !== null',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'value != null',
+    },
+    {
+      code: 'null === value',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'value == null',
+    },
+
+    // Pattern 1: Single strict undefined check
+    {
+      code: 'value === undefined',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'value == null',
+    },
+    {
+      code: 'value !== undefined',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'value != null',
+    },
+    {
+      code: 'undefined === value',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'value == null',
+    },
+
+    // Pattern 2: Combined null/undefined OR checks
     {
       code: 'value === null || value === undefined',
       errors: [{ messageId: 'preferLooseNullishEquality' }],
@@ -71,7 +84,7 @@ ruleTester.run('prefer-loose-nullish-equality', preferLooseNullishEquality, {
       output: 'value == null',
     },
 
-    // Pattern 2: Combined null/undefined AND checks
+    // Pattern 3: Combined null/undefined AND checks
     {
       code: 'value !== null && value !== undefined',
       errors: [{ messageId: 'preferLooseNullishEquality' }],
@@ -88,25 +101,78 @@ ruleTester.run('prefer-loose-nullish-equality', preferLooseNullishEquality, {
       output: 'value != null',
     },
 
-    // Real-world examples: Combined checks in if statements (from MR #6439)
+    // Complex expressions (property access)
+    {
+      code: 'obj.prop === null',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'obj.prop == null',
+    },
+    {
+      code: 'obj.prop.nested === undefined',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'obj.prop.nested == null',
+    },
+
+    // Array indexing
+    {
+      code: 'arr[0] === undefined',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'arr[0] == null',
+    },
+    {
+      code: 'items[index] !== null',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'items[index] != null',
+    },
+
+    // Optional chaining
+    {
+      code: 'obj?.prop === null',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'obj?.prop == null',
+    },
+    {
+      code: 'data?.user?.name !== undefined',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'data?.user?.name != null',
+    },
+
+    // In if statements (real example from MR #6439)
     {
       code: 'if (pageTitle === null || pageTitle === undefined) {}',
       errors: [{ messageId: 'preferLooseNullishEquality' }],
       output: 'if (pageTitle == null) {}',
     },
 
-    // Real-world examples: Combined checks in ternary (from MR #6439)
+    // In ternary expressions (real example from MR #6439)
     {
       code: 'props.disabled === undefined || props.disabled === null ? {} : { disabled: props.disabled }',
       errors: [{ messageId: 'preferLooseNullishEquality' }],
       output: 'props.disabled == null ? {} : { disabled: props.disabled }',
     },
+    {
+      code: 'const result = value === null ? defaultValue : value',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'const result = value == null ? defaultValue : value',
+    },
 
-    // Negated combined expressions
+    // Negated expressions
     {
       code: '!(value === null || value === undefined)',
       errors: [{ messageId: 'preferLooseNullishEquality' }],
       output: '!(value == null)',
+    },
+
+    // Function calls
+    {
+      code: 'getValue() === null',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'getValue() == null',
+    },
+    {
+      code: 'fetchData() !== undefined',
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: 'fetchData() != null',
     },
   ],
 });

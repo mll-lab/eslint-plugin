@@ -4,7 +4,9 @@ ESLint plugin and common configuration of MLL
 
 ## Installation
 
-    yarn add --dev @mll-lab/eslint-plugin
+```shell
+yarn add --dev @mll-lab/eslint-plugin
+```
 
 ## Configuration
 

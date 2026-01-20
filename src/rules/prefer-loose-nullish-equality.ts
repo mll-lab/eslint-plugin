@@ -6,26 +6,23 @@
  * - In JavaScript: null !== undefined but null == undefined
  * - Loose comparison to null covers both cases with a single check
  *
- * This rule ONLY flags explicit combined checks. Single checks are considered intentional.
- *
  * Examples:
  *
- * // Bad (redundant combined checks)
+ * // Bad
  * if (value === null || value === undefined) { }
+ * if (value === null) { }  // when value could also be undefined
  * if (value !== null && value !== undefined) { }
  *
  * // Good
  * if (value == null) { }
  * if (value != null) { }
  *
- * // Also OK (intentional single checks)
- * if (value === null) { }  // explicitly checking only null
- * if (value !== undefined) { }  // explicitly checking only undefined
+ * // Still OK (not nullish comparisons)
  * if (typeof value === 'undefined') { }  // typeof check
+ * if (x === y) { }  // comparing two variables
  */
 
 import {
-  AST_NODE_TYPES,
   ESLintUtils,
   TSESLint,
   TSESTree,
@@ -60,19 +57,14 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      * Check if a node is the literal null
      */
     function isNullLiteral(node: TSESTree.Node): boolean {
-      return (
-        node.type === AST_NODE_TYPES.Literal &&
-        (node as TSESTree.Literal).value === null
-      );
+      return node.type === 'Literal' && node.value === null;
     }
 
     /**
      * Check if a node is the identifier undefined
      */
     function isUndefinedIdentifier(node: TSESTree.Node): boolean {
-      return (
-        node.type === AST_NODE_TYPES.Identifier && node.name === 'undefined'
-      );
+      return node.type === 'Identifier' && node.name === 'undefined';
     }
 
     /**
@@ -80,6 +72,13 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      */
     function isNullish(node: TSESTree.Node): boolean {
       return isNullLiteral(node) || isUndefinedIdentifier(node);
+    }
+
+    /**
+     * Check if a node is a typeof expression
+     */
+    function isTypeofExpression(node: TSESTree.Node): boolean {
+      return node.type === 'UnaryExpression' && node.operator === 'typeof';
     }
 
     /**
@@ -108,9 +107,7 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
      * Check if a BinaryExpression checks for undefined
      */
     function checksUndefined(node: TSESTree.BinaryExpression): boolean {
-      return (
-        isUndefinedIdentifier(node.left) || isUndefinedIdentifier(node.right)
-      );
+      return isUndefinedIdentifier(node.left) || isUndefinedIdentifier(node.right);
     }
 
     /**
@@ -126,6 +123,33 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
 
       // Use source code comparison as a simple heuristic
       return sourceCode.getText(node1) === sourceCode.getText(node2);
+    }
+
+    /**
+     * Report a strict nullish comparison and provide a fix
+     */
+    function reportStrictNullishComparison(
+      node: TSESTree.BinaryExpression,
+    ): void {
+      const newOperator = node.operator === '===' ? '==' : '!=';
+      const comparedExpr = getComparedExpression(node);
+
+      if (!comparedExpr) {
+        return;
+      }
+
+      context.report({
+        node,
+        messageId: 'preferLooseNullishEquality',
+        data: {
+          operator: newOperator,
+        },
+        fix(fixer) {
+          const valueText = sourceCode.getText(comparedExpr);
+          const fixed = `${valueText} ${newOperator} null`;
+          return fixer.replaceText(node, fixed);
+        },
+      });
     }
 
     /**
@@ -159,13 +183,58 @@ export const preferLooseNullishEquality: TSESLint.RuleModule<
     }
 
     return {
+      BinaryExpression(node: TSESTree.BinaryExpression): void {
+        // Only check strict equality operators
+        if (node.operator !== '===' && node.operator !== '!==') {
+          return;
+        }
+
+        // Don't flag typeof checks
+        if (isTypeofExpression(node.left) || isTypeofExpression(node.right)) {
+          return;
+        }
+
+        // Check if this is part of a combined null/undefined check
+        // If so, the LogicalExpression visitor will handle it
+        const { parent } = node;
+        if (parent && parent.type === 'LogicalExpression') {
+          const sibling = parent.left === node ? parent.right : parent.left;
+
+          // Check if both sides are nullish checks on the same variable
+          if (
+            sibling &&
+            sibling.type === 'BinaryExpression' &&
+            sibling.operator === node.operator &&
+            (isNullish(node.left) || isNullish(node.right)) &&
+            (isNullish(sibling.left) || isNullish(sibling.right))
+          ) {
+            const thisExpr = getComparedExpression(node);
+            const siblingExpr = getComparedExpression(sibling);
+
+            if (
+              thisExpr &&
+              siblingExpr &&
+              areExpressionsEquivalent(thisExpr, siblingExpr)
+            ) {
+              // Skip this node - the LogicalExpression visitor will handle it
+              return;
+            }
+          }
+        }
+
+        // Check if comparing to null or undefined
+        if (isNullish(node.left) || isNullish(node.right)) {
+          reportStrictNullishComparison(node);
+        }
+      },
+
       LogicalExpression(node: TSESTree.LogicalExpression): void {
         const { left, right, operator } = node;
 
         // Must be binary expressions on both sides
         if (
-          left.type !== AST_NODE_TYPES.BinaryExpression ||
-          right.type !== AST_NODE_TYPES.BinaryExpression
+          left.type !== 'BinaryExpression' ||
+          right.type !== 'BinaryExpression'
         ) {
           return;
         }
