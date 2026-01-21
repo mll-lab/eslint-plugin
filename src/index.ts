@@ -3,17 +3,20 @@ import { TSESLint } from '@typescript-eslint/experimental-utils';
 import { castToBoolean } from './rules/cast-to-boolean';
 import { noColorLiterals } from './rules/no-color-literals';
 import { noGlobalStyles } from './rules/no-global-styles';
+import { preferLooseNullishEquality } from './rules/prefer-loose-nullish-equality';
 
 const rules = {
   'cast-to-boolean': castToBoolean,
   'no-color-literals': noColorLiterals,
   'no-global-styles': noGlobalStyles,
+  'prefer-loose-nullish-equality': preferLooseNullishEquality,
 };
 
 const recommendedRules: Record<string, TSESLint.Linter.RuleEntry> = {
   '@mll-lab/cast-to-boolean': 'error',
   '@mll-lab/no-color-literals': 'error',
   '@mll-lab/no-global-styles': 'error',
+  '@mll-lab/prefer-loose-nullish-equality': 'error',
 };
 
 type Plugin = {
