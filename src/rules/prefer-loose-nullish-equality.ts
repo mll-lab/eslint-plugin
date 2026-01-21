@@ -1,6 +1,5 @@
 /**
  * Enforces loose equality (==, !=) for nullish comparisons per MLL coding guidelines.
- * https://gitlab.mll/documentation/coding-guidelines/-/wikis/java-type-script#comparisons-with-potentially-nullish-values
  *
  * When checking if a value is nullish (null or undefined), prefer loose equality because:
  * - In JavaScript: null !== undefined but null == undefined

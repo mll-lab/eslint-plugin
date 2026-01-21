@@ -30,6 +30,10 @@ ruleTester.run('prefer-loose-nullish-equality', preferLooseNullishEquality, {
 
     // Nullish coalescence
     { code: 'const result = value ?? defaultValue' },
+
+    // Mixed nullish and other checks (nullish part already using loose equality)
+    { code: "a == null || a === ''" },
+    { code: "a != null && a !== ''" },
   ],
 
   invalid: [
@@ -137,14 +141,14 @@ ruleTester.run('prefer-loose-nullish-equality', preferLooseNullishEquality, {
       output: 'data?.user?.name != null',
     },
 
-    // In if statements (real example from MR #6439)
+    // In if statements
     {
       code: 'if (pageTitle === null || pageTitle === undefined) {}',
       errors: [{ messageId: 'preferLooseNullishEquality' }],
       output: 'if (pageTitle == null) {}',
     },
 
-    // In ternary expressions (real example from MR #6439)
+    // In ternary expressions
     {
       code: 'props.disabled === undefined || props.disabled === null ? {} : { disabled: props.disabled }',
       errors: [{ messageId: 'preferLooseNullishEquality' }],
@@ -173,6 +177,18 @@ ruleTester.run('prefer-loose-nullish-equality', preferLooseNullishEquality, {
       code: 'fetchData() !== undefined',
       errors: [{ messageId: 'preferLooseNullishEquality' }],
       output: 'fetchData() != null',
+    },
+
+    // Mixed nullish and other checks (should flag nullish parts only)
+    {
+      code: "a === null || a === undefined || a === ''",
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: "a == null || a === ''",
+    },
+    {
+      code: "a !== null && a !== undefined && a !== ''",
+      errors: [{ messageId: 'preferLooseNullishEquality' }],
+      output: "a != null && a !== ''",
     },
   ],
 });
