@@ -7,44 +7,43 @@ import {
 
 type MessageIds = 'preferNamedImport';
 
+type MemberNode = TSESTree.MemberExpression | TSESTree.JSXMemberExpression;
+
+type Violation = {
+  node: MemberNode;
+  name: string;
+};
+
 const REACT_EXPORTS = new Set([
-  // Components
+  'Children',
   'Fragment',
+  'Profiler',
   'StrictMode',
   'Suspense',
-  'Profiler',
-  // Hooks
-  'useState',
-  'useEffect',
-  'useContext',
-  'useReducer',
-  'useCallback',
-  'useMemo',
-  'useRef',
-  'useImperativeHandle',
-  'useLayoutEffect',
-  'useDebugValue',
-  'useDeferredValue',
-  'useTransition',
-  'useId',
-  'useSyncExternalStore',
-  'useInsertionEffect',
-  // HOCs/Utilities
-  'memo',
-  'forwardRef',
-  'lazy',
+  'cloneElement',
   'createContext',
   'createElement',
-  'cloneElement',
-  'isValidElement',
-  'Children',
   'createRef',
+  'forwardRef',
+  'isValidElement',
+  'lazy',
+  'memo',
+  'useCallback',
+  'useContext',
+  'useDebugValue',
+  'useDeferredValue',
+  'useEffect',
+  'useId',
+  'useImperativeHandle',
+  'useInsertionEffect',
+  'useLayoutEffect',
+  'useMemo',
+  'useReducer',
+  'useRef',
+  'useState',
+  'useSyncExternalStore',
+  'useTransition',
 ]);
-
-interface Violation {
-  node: TSESTree.MemberExpression | TSESTree.JSXMemberExpression;
-  name: string;
-}
 
 export const preferNamedReactImports: TSESLint.RuleModule<
   MessageIds,
@@ -66,16 +65,13 @@ export const preferNamedReactImports: TSESLint.RuleModule<
     fixable: 'code',
   },
   defaultOptions: [],
-  create: (context) => {
+  create(context) {
     let reactImportNode: TSESTree.ImportDeclaration | null = null;
     const existingNamedImports = new Set<string>();
     const violations: Array<Violation> = [];
 
-    const isReactMemberAccess = (
-      node: TSESTree.MemberExpression | TSESTree.JSXMemberExpression,
-    ): string | null => {
-      const { object } = node;
-      const { property } = node;
+    function getReactMemberName(node: MemberNode): string | null {
+      const { object, property } = node;
 
       const isReactObject =
         (object.type === AST_NODE_TYPES.Identifier ||
@@ -86,56 +82,45 @@ export const preferNamedReactImports: TSESLint.RuleModule<
         return null;
       }
 
-      const isIdentifierProperty =
-        property.type === AST_NODE_TYPES.Identifier ||
-        property.type === AST_NODE_TYPES.JSXIdentifier;
-
-      if (!isIdentifierProperty) {
+      if (
+        property.type !== AST_NODE_TYPES.Identifier &&
+        property.type !== AST_NODE_TYPES.JSXIdentifier
+      ) {
         return null;
       }
 
-      const propertyName = property.name;
-      if (!REACT_EXPORTS.has(propertyName)) {
+      if (!REACT_EXPORTS.has(property.name)) {
         return null;
       }
 
-      return propertyName;
-    };
+      return property.name;
+    }
 
-    const collectViolation = (
-      node: TSESTree.MemberExpression | TSESTree.JSXMemberExpression,
-      name: string,
-    ): void => {
-      violations.push({ node, name });
-    };
+    function checkMemberExpression(node: MemberNode): void {
+      const name = getReactMemberName(node);
+      if (name !== null) {
+        violations.push({ node, name });
+      }
+    }
 
     return {
       ImportDeclaration(node) {
-        if (node.source.value === 'react') {
-          reactImportNode = node;
-          for (const specifier of node.specifiers) {
-            if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
-              existingNamedImports.add(specifier.imported.name);
-            }
+        if (node.source.value !== 'react') {
+          return;
+        }
+
+        reactImportNode = node;
+        for (const specifier of node.specifiers) {
+          if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
+            existingNamedImports.add(specifier.imported.name);
           }
         }
       },
 
-      MemberExpression(node) {
-        const name = isReactMemberAccess(node);
-        if (name) {
-          collectViolation(node, name);
-        }
-      },
+      MemberExpression: checkMemberExpression,
+      JSXMemberExpression: checkMemberExpression,
 
-      JSXMemberExpression(node) {
-        const name = isReactMemberAccess(node);
-        if (name) {
-          collectViolation(node, name);
-        }
-      },
-
-      'Program:exit'() {
+      'Program:exit': function () {
         if (violations.length === 0) {
           return;
         }
@@ -157,45 +142,39 @@ export const preferNamedReactImports: TSESLint.RuleModule<
             *fix(fixer) {
               yield fixer.replaceText(node, name);
 
-              if (reactImportNode && neededImports.size > 0) {
-                const importsToAdd = Array.from(neededImports).sort();
-                const hasDefaultImport = reactImportNode.specifiers.some(
-                  (s) => s.type === AST_NODE_TYPES.ImportDefaultSpecifier,
-                );
-                const hasNamedImports = reactImportNode.specifiers.some(
-                  (s) => s.type === AST_NODE_TYPES.ImportSpecifier,
-                );
-
-                if (hasNamedImports) {
-                  const lastNamedImport = reactImportNode.specifiers
-                    .filter((s) => s.type === AST_NODE_TYPES.ImportSpecifier)
-                    .at(-1);
-                  if (lastNamedImport) {
-                    yield fixer.insertTextAfter(
-                      lastNamedImport,
-                      `, ${importsToAdd.join(', ')}`,
-                    );
-                  }
-                } else if (hasDefaultImport) {
-                  const defaultImport = reactImportNode.specifiers.find(
-                    (s) => s.type === AST_NODE_TYPES.ImportDefaultSpecifier,
-                  );
-                  if (defaultImport) {
-                    yield fixer.insertTextAfter(
-                      defaultImport,
-                      `, { ${importsToAdd.join(', ')} }`,
-                    );
-                  }
-                } else {
-                  const importText = `import { ${importsToAdd.join(', ')} } from 'react';\n`;
-                  yield fixer.insertTextBefore(
-                    sourceCode.ast.body[0],
-                    importText,
-                  );
-                }
-
-                neededImports.clear();
+              if (reactImportNode === null || neededImports.size === 0) {
+                return;
               }
+
+              const importsToAdd = Array.from(neededImports).sort();
+              const lastNamedImport = reactImportNode.specifiers
+                .filter((s) => s.type === AST_NODE_TYPES.ImportSpecifier)
+                .at(-1);
+              const defaultImport = reactImportNode.specifiers.find(
+                (s) => s.type === AST_NODE_TYPES.ImportDefaultSpecifier,
+              );
+
+              if (lastNamedImport) {
+                yield fixer.insertTextAfter(
+                  lastNamedImport,
+                  `, ${importsToAdd.join(', ')}`,
+                );
+              } else if (defaultImport) {
+                yield fixer.insertTextAfter(
+                  defaultImport,
+                  `, { ${importsToAdd.join(', ')} }`,
+                );
+              } else {
+                const importText = `import { ${importsToAdd.join(
+                  ', ',
+                )} } from 'react';\n`;
+                yield fixer.insertTextBefore(
+                  sourceCode.ast.body[0],
+                  importText,
+                );
+              }
+
+              neededImports.clear();
             },
           });
         }
