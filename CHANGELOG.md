@@ -1,3 +1,10 @@
+## [1.5.3](https://github.com/mll-lab/eslint-plugin/compare/v1.5.2...v1.5.3) (2026-01-30)
+
+
+### Bug Fixes
+
+* **rule:** resolve lint violations in prefer-named-react-imports ([671f8b6](https://github.com/mll-lab/eslint-plugin/commit/671f8b6968e6a0b37eb1e9ccef9028eec5b44085))
+
 ## [1.5.2](https://github.com/mll-lab/eslint-plugin/compare/v1.5.1...v1.5.2) (2026-01-30)
 
 
