@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/mll-lab/eslint-plugin/compare/v1.5.1...v1.5.2) (2026-01-30)
+
+
+### Bug Fixes
+
+* **rule:** simplify prefer-named-react-imports implementation ([1e440b8](https://github.com/mll-lab/eslint-plugin/commit/1e440b8d97ab80ce27376f8ffacadf8f64cb985c))
+
 ## [1.5.1](https://github.com/mll-lab/eslint-plugin/compare/v1.5.0...v1.5.1) (2026-01-30)
 
 
