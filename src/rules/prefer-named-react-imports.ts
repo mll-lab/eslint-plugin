@@ -82,18 +82,15 @@ export const preferNamedReactImports: TSESLint.RuleModule<
         return null;
       }
 
-      if (
-        property.type !== AST_NODE_TYPES.Identifier &&
-        property.type !== AST_NODE_TYPES.JSXIdentifier
-      ) {
+      const isNamedProperty =
+        property.type === AST_NODE_TYPES.Identifier ||
+        property.type === AST_NODE_TYPES.JSXIdentifier;
+
+      if (!isNamedProperty) {
         return null;
       }
 
-      if (!REACT_EXPORTS.has(property.name)) {
-        return null;
-      }
-
-      return property.name;
+      return REACT_EXPORTS.has(property.name) ? property.name : null;
     }
 
     function checkMemberExpression(node: MemberNode): void {
@@ -110,31 +107,32 @@ export const preferNamedReactImports: TSESLint.RuleModule<
         }
 
         reactImportNode = node;
-        for (const specifier of node.specifiers) {
+        node.specifiers.forEach((specifier) => {
           if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
             existingNamedImports.add(specifier.imported.name);
           }
-        }
+        });
       },
 
       MemberExpression: checkMemberExpression,
       JSXMemberExpression: checkMemberExpression,
 
-      'Program:exit': function () {
+      'Program:exit': function handleProgramExit() {
         if (violations.length === 0) {
           return;
         }
 
         const neededImports = new Set<string>();
-        for (const { name } of violations) {
+        violations.forEach(({ name }) => {
           if (!existingNamedImports.has(name)) {
             neededImports.add(name);
           }
-        }
+        });
 
         const sourceCode = context.getSourceCode();
+        const importNode = reactImportNode;
 
-        for (const { node, name } of violations) {
+        violations.forEach(({ node, name }) => {
           context.report({
             node,
             messageId: 'preferNamedImport',
@@ -142,18 +140,21 @@ export const preferNamedReactImports: TSESLint.RuleModule<
             *fix(fixer) {
               yield fixer.replaceText(node, name);
 
-              if (reactImportNode === null || neededImports.size === 0) {
+              if (importNode === null || neededImports.size === 0) {
                 return;
               }
 
               const importsToAdd = Array.from(neededImports).sort();
-              const lastNamedImport = reactImportNode.specifiers
-                .filter((s) => s.type === AST_NODE_TYPES.ImportSpecifier)
-                .at(-1);
-              const defaultImport = reactImportNode.specifiers.find(
-                (s) => s.type === AST_NODE_TYPES.ImportDefaultSpecifier,
+              const namedImports = importNode.specifiers.filter(
+                (specifier): specifier is TSESTree.ImportSpecifier =>
+                  specifier.type === AST_NODE_TYPES.ImportSpecifier,
+              );
+              const defaultImport = importNode.specifiers.find(
+                (specifier): specifier is TSESTree.ImportDefaultSpecifier =>
+                  specifier.type === AST_NODE_TYPES.ImportDefaultSpecifier,
               );
 
+              const lastNamedImport = namedImports.at(-1);
               if (lastNamedImport) {
                 yield fixer.insertTextAfter(
                   lastNamedImport,
@@ -165,19 +166,16 @@ export const preferNamedReactImports: TSESLint.RuleModule<
                   `, { ${importsToAdd.join(', ')} }`,
                 );
               } else {
-                const importText = `import { ${importsToAdd.join(
-                  ', ',
-                )} } from 'react';\n`;
                 yield fixer.insertTextBefore(
                   sourceCode.ast.body[0],
-                  importText,
+                  `import { ${importsToAdd.join(', ')} } from 'react';\n`,
                 );
               }
 
               neededImports.clear();
             },
           });
-        }
+        });
       },
     };
   },
