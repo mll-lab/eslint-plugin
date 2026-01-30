@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/mll-lab/eslint-plugin/compare/v1.5.0...v1.5.1) (2026-01-30)
+
+
+### Bug Fixes
+
+* **rule:** add import modification to prefer-named-react-imports auto-fix ([d386802](https://github.com/mll-lab/eslint-plugin/commit/d3868024d9929198b0a612c085aeb42c70774c86))
+
 # [1.5.0](https://github.com/mll-lab/eslint-plugin/compare/v1.4.0...v1.5.0) (2026-01-30)
 
 
