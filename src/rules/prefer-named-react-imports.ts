@@ -41,6 +41,11 @@ const REACT_EXPORTS = new Set([
   'createRef',
 ]);
 
+interface Violation {
+  node: TSESTree.MemberExpression | TSESTree.JSXMemberExpression;
+  name: string;
+}
+
 export const preferNamedReactImports: TSESLint.RuleModule<
   MessageIds,
   Array<never>
@@ -62,13 +67,16 @@ export const preferNamedReactImports: TSESLint.RuleModule<
   },
   defaultOptions: [],
   create: (context) => {
+    let reactImportNode: TSESTree.ImportDeclaration | null = null;
+    const existingNamedImports = new Set<string>();
+    const violations: Array<Violation> = [];
+
     const isReactMemberAccess = (
       node: TSESTree.MemberExpression | TSESTree.JSXMemberExpression,
     ): string | null => {
       const { object } = node;
       const { property } = node;
 
-      // MemberExpression uses Identifier, JSXMemberExpression uses JSXIdentifier
       const isReactObject =
         (object.type === AST_NODE_TYPES.Identifier ||
           object.type === AST_NODE_TYPES.JSXIdentifier) &&
@@ -94,34 +102,102 @@ export const preferNamedReactImports: TSESLint.RuleModule<
       return propertyName;
     };
 
-    const reportAndFix = (
+    const collectViolation = (
       node: TSESTree.MemberExpression | TSESTree.JSXMemberExpression,
       name: string,
     ): void => {
-      context.report({
-        node,
-        messageId: 'preferNamedImport',
-        data: { name },
-        fix(fixer) {
-          // Replace React.X with X
-          // The named import must be added manually or via TypeScript auto-import
-          return fixer.replaceText(node, name);
-        },
-      });
+      violations.push({ node, name });
     };
 
     return {
+      ImportDeclaration(node) {
+        if (node.source.value === 'react') {
+          reactImportNode = node;
+          for (const specifier of node.specifiers) {
+            if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
+              existingNamedImports.add(specifier.imported.name);
+            }
+          }
+        }
+      },
+
       MemberExpression(node) {
         const name = isReactMemberAccess(node);
         if (name) {
-          reportAndFix(node, name);
+          collectViolation(node, name);
         }
       },
 
       JSXMemberExpression(node) {
         const name = isReactMemberAccess(node);
         if (name) {
-          reportAndFix(node, name);
+          collectViolation(node, name);
+        }
+      },
+
+      'Program:exit'() {
+        if (violations.length === 0) {
+          return;
+        }
+
+        const neededImports = new Set<string>();
+        for (const { name } of violations) {
+          if (!existingNamedImports.has(name)) {
+            neededImports.add(name);
+          }
+        }
+
+        const sourceCode = context.getSourceCode();
+
+        for (const { node, name } of violations) {
+          context.report({
+            node,
+            messageId: 'preferNamedImport',
+            data: { name },
+            *fix(fixer) {
+              yield fixer.replaceText(node, name);
+
+              if (reactImportNode && neededImports.size > 0) {
+                const importsToAdd = Array.from(neededImports).sort();
+                const hasDefaultImport = reactImportNode.specifiers.some(
+                  (s) => s.type === AST_NODE_TYPES.ImportDefaultSpecifier,
+                );
+                const hasNamedImports = reactImportNode.specifiers.some(
+                  (s) => s.type === AST_NODE_TYPES.ImportSpecifier,
+                );
+
+                if (hasNamedImports) {
+                  const lastNamedImport = reactImportNode.specifiers
+                    .filter((s) => s.type === AST_NODE_TYPES.ImportSpecifier)
+                    .at(-1);
+                  if (lastNamedImport) {
+                    yield fixer.insertTextAfter(
+                      lastNamedImport,
+                      `, ${importsToAdd.join(', ')}`,
+                    );
+                  }
+                } else if (hasDefaultImport) {
+                  const defaultImport = reactImportNode.specifiers.find(
+                    (s) => s.type === AST_NODE_TYPES.ImportDefaultSpecifier,
+                  );
+                  if (defaultImport) {
+                    yield fixer.insertTextAfter(
+                      defaultImport,
+                      `, { ${importsToAdd.join(', ')} }`,
+                    );
+                  }
+                } else {
+                  const importText = `import { ${importsToAdd.join(', ')} } from 'react';\n`;
+                  yield fixer.insertTextBefore(
+                    sourceCode.ast.body[0],
+                    importText,
+                  );
+                }
+
+                neededImports.clear();
+              }
+            },
+          });
         }
       },
     };
