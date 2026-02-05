@@ -7,7 +7,10 @@ import {
 
 type MessageIds = 'preferNamedImport';
 
-type MemberNode = TSESTree.MemberExpression | TSESTree.JSXMemberExpression;
+type MemberNode =
+  | TSESTree.MemberExpression
+  | TSESTree.JSXMemberExpression
+  | TSESTree.TSQualifiedName;
 
 type Violation = {
   node: MemberNode;
@@ -43,6 +46,29 @@ const REACT_EXPORTS = new Set([
   'useState',
   'useSyncExternalStore',
   'useTransition',
+  // Types
+  'ButtonHTMLAttributes',
+  'ChangeEvent',
+  'ComponentProps',
+  'ComponentType',
+  'CSSProperties',
+  'Dispatch',
+  'FC',
+  'FocusEvent',
+  'FormEvent',
+  'FunctionComponent',
+  'HTMLAttributes',
+  'InputHTMLAttributes',
+  'JSX',
+  'KeyboardEvent',
+  'MouseEvent',
+  'MutableRefObject',
+  'PropsWithChildren',
+  'ReactElement',
+  'ReactNode',
+  'Ref',
+  'RefObject',
+  'SetStateAction',
 ]);
 
 export const preferNamedReactImports: TSESLint.RuleModule<
@@ -71,6 +97,16 @@ export const preferNamedReactImports: TSESLint.RuleModule<
     const violations: Array<Violation> = [];
 
     function getReactMemberName(node: MemberNode): string | null {
+      if (node.type === AST_NODE_TYPES.TSQualifiedName) {
+        const { left, right } = node;
+
+        if (left.type !== AST_NODE_TYPES.Identifier || left.name !== 'React') {
+          return null;
+        }
+
+        return REACT_EXPORTS.has(right.name) ? right.name : null;
+      }
+
       const { object, property } = node;
 
       const isReactObject =
@@ -116,6 +152,7 @@ export const preferNamedReactImports: TSESLint.RuleModule<
 
       MemberExpression: checkMemberExpression,
       JSXMemberExpression: checkMemberExpression,
+      TSQualifiedName: checkMemberExpression,
 
       'Program:exit': function handleProgramExit() {
         if (violations.length === 0) {

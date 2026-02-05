@@ -100,5 +100,15 @@ const x = <React.Fragment>content</React.Fragment>;`,
       output: `import React, { useState, Fragment } from 'react';
 const x = <Fragment>content</Fragment>;`,
     },
+    // React.CSSProperties type usage
+    {
+      code: `import React from 'react';
+const style: React.CSSProperties = { color: 'red' };`,
+      errors: [
+        { messageId: 'preferNamedImport', data: { name: 'CSSProperties' } },
+      ],
+      output: `import React, { CSSProperties } from 'react';
+const style: CSSProperties = { color: 'red' };`,
+    },
   ],
 });
