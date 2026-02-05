@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/mll-lab/eslint-plugin/compare/v1.5.3...v1.6.0) (2026-02-05)
+
+
+### Features
+
+* **rule:** add React type exports to prefer-named-react-imports ([7165b20](https://github.com/mll-lab/eslint-plugin/commit/7165b203c39c2fb531da8d00fd8692686383614c))
+
 ## [1.5.3](https://github.com/mll-lab/eslint-plugin/compare/v1.5.2...v1.5.3) (2026-01-30)
 
 
